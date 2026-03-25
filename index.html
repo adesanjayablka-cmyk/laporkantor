@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0f0c29">
+  <title>Lapor Keluar Masuk</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-height:100vh;color:#fff;padding:12px}
+    .container{max-width:420px;margin:0 auto}
+    .header{text-align:center;padding:18px 0 15px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:18px}
+    .header .icon{font-size:36px;margin-bottom:6px}
+    .header h1{font-size:18px;color:#00d4ff;letter-spacing:1px}
+    .header p{font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px}
+    .clock{text-align:center;font-size:28px;font-weight:700;color:#fff;font-family:'Courier New',monospace;margin-bottom:18px;text-shadow:0 0 20px rgba(0,212,255,0.3)}
+    .clock .date{font-size:12px;color:rgba(255,255,255,0.5);font-weight:400;margin-top:2px}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;font-size:13px;color:rgba(255,255,255,0.75);margin-bottom:6px;font-weight:600}
+    select,input,textarea{width:100%;padding:13px 14px;border:2px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.07);color:#fff;font-size:15px;outline:none;transition:all 0.25s;font-family:inherit}
+    select:focus,input:focus,textarea:focus{border-color:#00d4ff;background:rgba(0,212,255,0.05);box-shadow:0 0 0 3px rgba(0,212,255,0.1)}
+    select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%2300d4ff'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:36px}
+    select option{background:#1a1a2e;color:#fff}
+    .pin-input{letter-spacing:12px;text-align:center;font-size:24px;font-weight:700}
+    textarea{height:70px;resize:none}
+    .btn-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+    .btn{padding:15px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:6px}
+    .btn:active{transform:scale(0.95)}
+    .btn:disabled{opacity:0.4;pointer-events:none}
+    .btn-keluar{background:linear-gradient(135deg,#ff416c,#ff4b2b);color:white;box-shadow:0 4px 15px rgba(255,65,108,0.35)}
+    .btn-masuk{background:linear-gradient(135deg,#11998e,#38ef7d);color:white;box-shadow:0 4px 15px rgba(56,239,125,0.35)}
+    .status-bar{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:12px;text-align:center;display:none}
+    .status-bar.diluar{display:block;background:rgba(255,65,108,0.12);border:1px solid rgba(255,65,108,0.25);color:#ff8fa3}
+    .status-bar.dikantor{display:block;background:rgba(56,239,125,0.12);border:1px solid rgba(56,239,125,0.25);color:#7dffb3}
+    .loading{display:none;text-align:center;padding:20px}
+    .loading.show{display:block}
+    .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.15);border-top-color:#00d4ff;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading p{font-size:13px;color:rgba(255,255,255,0.6)}
+    .result{margin-top:15px;padding:14px;border-radius:10px;font-size:13px;line-height:1.5;display:none;animation:fadeIn 0.3s;white-space:pre-line}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .result.success{display:block;background:rgba(56,239,125,0.12);border:1px solid rgba(56,239,125,0.25);color:#7dffb3}
+    .result.error{display:block;background:rgba(255,65,108,0.12);border:1px solid rgba(255,65,108,0.25);color:#ff8fa3}
+    .info-box{margin-top:15px;padding:12px;border-radius:8px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15)}
+    .info-box p{font-size:11px;color:rgba(0,212,255,0.7);margin:3px 0}
+    .info-box .title{font-size:12px;font-weight:600;color:#00d4ff;margin-bottom:6px}
+    .footer{text-align:center;margin-top:20px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:rgba(255,255,255,0.25)}
+    .footer .warn{color:rgba(255,200,50,0.6);margin-bottom:4px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="icon">🏢</div>
+      <h1>LAPOR KELUAR / MASUK</h1>
+      <p>Sistem Pencatatan Pegawai</p>
+    </div>
+    <div class="clock">
+      <div id="jam">--:--:--</div>
+      <div class="date" id="tanggal">Memuat...</div>
+    </div>
+    <div class="form-group">
+      <label>👤 Nama Pegawai</label>
+      <select id="nama" onchange="cekStatus()">
+        <option value="">-- Pilih Nama Anda --</option>
+      </select>
+    </div>
+    <div class="status-bar" id="statusBar"></div>
+    <div class="form-group">
+      <label>🔒 PIN (4 digit)</label>
+      <input type="password" id="pin" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" class="pin-input" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>📝 Keperluan Keluar Kantor</label>
+      <textarea id="keperluan" placeholder="Contoh: Rapat di dinas pendidikan..."></textarea>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-keluar" id="btnKeluar" onclick="submitKeluar()">🔴 KELUAR</button>
+      <button class="btn btn-masuk" id="btnMasuk" onclick="submitMasuk()">🟢 MASUK</button>
+    </div>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Memproses data...</p>
+    </div>
+    <div class="result" id="result"></div>
+    <div class="info-box">
+      <p class="title">📧 INFO REMINDER</p>
+      <p>• Jika belum lapor MASUK dalam 1 jam, email pengingat otomatis terkirim.</p>
+      <p>• Jika belum kembali 2 jam, atasan mendapat email laporan.</p>
+    </div>
+    <div class="footer">
+      <p class="warn">⚠️ Input dilakukan di depan pos satpam</p>
+      <p>Sistem Pencatatan v1.2</p>
+    </div>
+  </div>
+
+<script>
+// ============================================================
+// ★★★ GANTI URL DI BAWAH INI DENGAN URL DEPLOYMENT ANDA ★★★
+// ============================================================
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZMoRFk6gBgi3DCQxXIRM-gnObHQzun15l8u10l1OqA3iNWTs6domBTCYGJZOEl4BDqQ/exec";
+// ============================================================
+
+// Fungsi panggil API
+function panggilAPI(params) {
+  var url = SCRIPT_URL + "?" + params;
+  return fetch(url)
+    .then(function(r) { return r.text(); })
+    .then(function(t) {
+      try { return JSON.parse(t); }
+      catch(e) { return { status:"error", message:"Gagal memproses data" }; }
+    });
+}
+
+// Jam realtime
+function updateClock() {
+  var n = new Date();
+  document.getElementById("jam").textContent = n.toLocaleTimeString("id-ID",{hour12:false});
+  document.getElementById("tanggal").textContent = n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Load nama pegawai saat halaman dibuka
+window.onload = function() {
+  panggilAPI("action=getNames")
+    .then(function(d) {
+      if (d.names) {
+        var sel = document.getElementById("nama");
+        d.names.sort();
+        for (var i = 0; i < d.names.length; i++) {
+          var opt = document.createElement("option");
+          opt.value = d.names[i];
+          opt.textContent = d.names[i];
+          sel.appendChild(opt);
+        }
+      }
+    })
+    .catch(function(e) { console.log("Error:", e); });
+};
+
+// Cek status pegawai
+function cekStatus() {
+  var nama = document.getElementById("nama").value;
+  var bar = document.getElementById("statusBar");
+  if (!nama) { bar.style.display = "none"; return; }
+
+  panggilAPI("action=getStatus&nama=" + encodeURIComponent(nama))
+    .then(function(d) {
+      if (d.diluar) {
+        bar.className = "status-bar diluar";
+        bar.innerHTML = "🔴 Status: <b>DILUAR KANTOR</b> sejak " + d.info.jamKeluar + "<br>Keperluan: " + d.info.keperluan;
+      } else {
+        bar.className = "status-bar dikantor";
+        bar.innerHTML = "🟢 Status: <b>DI DALAM KANTOR</b>";
+      }
+    })
+    .catch(function() { bar.style.display = "none"; });
+}
+
+// Submit KELUAR
+function submitKeluar() {
+  var n = document.getElementById("nama").value;
+  var p = document.getElementById("pin").value;
+  var k = document.getElementById("keperluan").value;
+  if (!n) return showResult("Pilih nama Anda!", "error");
+  if (!p || p.length !== 4) return showResult("Masukkan PIN 4 digit!", "error");
+  if (!k || k.length < 3) return showResult("Isi keperluan keluar!", "error");
+
+  setLoading(true);
+  panggilAPI("action=submitKeluar&nama=" + encodeURIComponent(n) + "&keperluan=" + encodeURIComponent(k) + "&pin=" + encodeURIComponent(p))
+    .then(function(d) {
+      setLoading(false);
+      showResult(d.message, d.status);
+      if (d.status === "success") {
+        document.getElementById("pin").value = "";
+        document.getElementById("keperluan").value = "";
+        setTimeout(cekStatus, 500);
+      }
+    })
+    .catch(function() { setLoading(false); showResult("Gagal. Periksa internet.", "error"); });
+}
+
+// Submit MASUK
+function submitMasuk() {
+  var n = document.getElementById("nama").value;
+  var p = document.getElementById("pin").value;
+  if (!n) return showResult("Pilih nama Anda!", "error");
+  if (!p || p.length !== 4) return showResult("Masukkan PIN 4 digit!", "error");
+
+  setLoading(true);
+  panggilAPI("action=submitMasuk&nama=" + encodeURIComponent(n) + "&pin=" + encodeURIComponent(p))
+    .then(function(d) {
+      setLoading(false);
+      showResult(d.message, d.status);
+      if (d.status === "success") {
+        document.getElementById("pin").value = "";
+        setTimeout(cekStatus, 500);
+      }
+    })
+    .catch(function() { setLoading(false); showResult("Gagal. Periksa internet.", "error"); });
+}
+
+// Tampilkan hasil
+function showResult(m, t) {
+  var e = document.getElementById("result");
+  e.textContent = m;
+  e.className = "result " + (t === "success" ? "success" : "error");
+  setTimeout(function() { e.className = "result"; }, 10000);
+  e.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+// Loading
+function setLoading(s) {
+  document.getElementById("loading").className = s ? "loading show" : "loading";
+  document.getElementById("btnKeluar").disabled = s;
+  document.getElementById("btnMasuk").disabled = s;
+  if (s) document.getElementById("result").className = "result";
+}
+</script>
+</body>
+</html>
